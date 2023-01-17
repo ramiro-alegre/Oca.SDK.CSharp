@@ -15,7 +15,7 @@ namespace OCA.SDK.HttpOca.Epak{
         /// </summary>
         public readonly string _url;
         private readonly WebClient wc;
-        private readonly HttpOcaEpakService _httpOcaEpakService;
+        private readonly HttpOcaEpakHelper _httpOcaEpakHelper;
         /// <summary>
         /// 
         /// </summary>
@@ -27,7 +27,7 @@ namespace OCA.SDK.HttpOca.Epak{
             _url = esProduccion ? "http://webservice.oca.com.ar/epak_tracking/" : "http://webservice.oca.com.ar/epak_Tracking_TEST/";
             this.esProduccion = esProduccion;
             this.wc = new WebClient();
-            this._httpOcaEpakService = new HttpOcaEpakService(_url);
+            this._httpOcaEpakHelper = new HttpOcaEpakHelper(_url);
         }
         /// <summary>
         /// Obtiene las sucursales con servicios activas al momento desde el servicio de Oca
@@ -38,7 +38,7 @@ namespace OCA.SDK.HttpOca.Epak{
         public List<Sucursal> GetCentrosImposicionConServicios(TipoServicio tipo = TipoServicio.SinFiltro, bool ConCodigosPostalesAcepta = false){
             string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetCentrosImposicionConServicios?");
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
-            return _httpOcaEpakService.DataSetToSucursal(dataset, tipo, ConCodigosPostalesAcepta);
+            return _httpOcaEpakHelper.DataSetToSucursal(dataset, tipo, ConCodigosPostalesAcepta);
         }
 
 
