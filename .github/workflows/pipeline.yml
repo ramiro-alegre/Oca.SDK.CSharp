@@ -1,0 +1,61 @@
+name: pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Build
+        run: |
+          cd src/Oca.SDK
+          dotnet build
+  
+  test:
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test
+        run: |
+          cd test/Oca.SDK.Tests
+          dotnet test
+
+  package:
+    runs-on: ubuntu-20.04
+    needs: [build, test]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Package a release
+        run: |
+          cd src/Oca.SDK
+          dotnet pack -c Release -o ../../artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts
+  
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: [build, test, package]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+          path: artifacts
+      - name: Deploy
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          cd artifacts
+          dotnet nuget push *.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+
