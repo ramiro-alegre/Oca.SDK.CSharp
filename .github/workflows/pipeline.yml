@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Test
         run: |
-          cd test/Oca.SDK.Tests
+          cd test/Oca.SDK.Test
           dotnet test
 
   package:
