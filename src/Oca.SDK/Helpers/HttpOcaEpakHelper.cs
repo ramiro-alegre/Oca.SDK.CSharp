@@ -18,7 +18,7 @@ namespace Oca.SDK.Services{
         /// <param name="tipo">Filtro que se le quiera agregara a las sucursales</param>
         /// <param name="conCodigosPostalesAcepta">En el caso de que sea TRUE, rellena la lista "CodigosPostalesQueAcepta" de la clase Sucursal, caso contrario, la deja vacia y sin inicializar</param>
         /// <returns>Lista de sucursales</returns>
-        public List<Sucursal> DataSetToSucursal(DataSet dataset, TipoServicio tipo, bool conCodigosPostalesAcepta = true)
+        public List<Sucursal> DataSetToSucursales(DataSet dataset, TipoServicio tipo, bool conCodigosPostalesAcepta = true)
         {
             List<Sucursal> sucursales = new List<Sucursal>();
             for (int i = 0; i < dataset.Tables[0].Rows.Count; i++)
@@ -142,6 +142,27 @@ namespace Oca.SDK.Services{
                 return Convert.ToInt32(Math.Round(numeroD));
             // * Un ejemplo de un return null es cuando numero es "S/N".
             return null;
+        }
+
+        /// <summary>
+        /// Se encarga de crear un objeto Provincia a partir de un Dat
+        /// </summary>
+        /// <param name="row">DataRow de la información de la provincia de oca</param>
+        /// <returns>Provincia creada a partir del datarow enviado</returns>
+        public List<Provincia> DataSetToProvincias(DataSet data)
+        {
+            List<Provincia> provincias = new List<Provincia>();
+            foreach (DataRow row in data.Tables[0].Rows)
+            {
+                provincias.Add(
+                    new Provincia()
+                    {
+                        Id = Convert.ToInt32(row["IdProvincia"].ToString()),
+                        Nombre = row["Descripcion"].ToString().Trim()
+                    }
+                );
+            }
+            return provincias;
         }
     }
 }

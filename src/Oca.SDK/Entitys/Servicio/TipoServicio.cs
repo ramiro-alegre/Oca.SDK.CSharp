@@ -9,11 +9,11 @@ namespace Oca.SDK.Entitys{
         /// </summary>
         SinFiltro = 0,
         /// <summary>
-        /// Admisión de paquetes hace referencia a que la sucursal puede recibir paquetes
+        /// La sucursal puede seleccionarse como origen de un envío.
         /// </summary>
         AdmisionDePaquetes = 1,
         /// <summary>
-        /// Entrega de paquetes hace referencia a que la sucursal puede encargarse de enviar paquetes.
+        /// La sucursal puede seleccionarse como destino de un envío.
         /// </summary>
         EntregaDePaquetes = 2,
         /// <summary>

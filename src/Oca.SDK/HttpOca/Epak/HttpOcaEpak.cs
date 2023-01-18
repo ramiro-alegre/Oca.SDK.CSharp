@@ -38,7 +38,17 @@ namespace OCA.SDK.HttpOca.Epak{
         public List<Sucursal> GetCentrosImposicionConServicios(TipoServicio tipo = TipoServicio.SinFiltro, bool ConCodigosPostalesAcepta = false){
             string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetCentrosImposicionConServicios?");
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
-            return _httpOcaEpakHelper.DataSetToSucursal(dataset, tipo, ConCodigosPostalesAcepta);
+            return _httpOcaEpakHelper.DataSetToSucursales(dataset, tipo, ConCodigosPostalesAcepta);
+        }
+        /// <summary>
+        /// Obtiene las provincias
+        /// </summary>
+        /// <returns>Lista de provincioas</returns>
+        public List<Provincia> GetProvincias()
+        {
+            string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetProvincias");
+            DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
+            return _httpOcaEpakHelper.DataSetToProvincias(dataset);
         }
 
 
