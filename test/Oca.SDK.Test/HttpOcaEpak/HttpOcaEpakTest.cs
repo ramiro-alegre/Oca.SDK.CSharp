@@ -17,20 +17,20 @@ public class HttpOcaEpakTest
     public void Obtener_Sucursales_Default_Correcto()
     {
         ResponseOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios();
-        Assert.AreNotEqual(responseOca.Data.Count, 0, "No se obtuvieron sucursales");
+        Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran sucursales");
     }
 
     [TestMethod]
     public void Obtener_Provincias_Correcto(){
         ResponseOca<Provincia> responseOca = httpOcaEpak.GetProvincias();
-        Assert.AreNotEqual(responseOca.Data.Count, 0, "No se obtuvieron provincias");
+        Assert.AreNotEqual(responseOca.Data.Count, 0, "Se espera que se devolvieran provincias");
     }
 
     [TestMethod]
     public void Obtener_Estados_Envio_Correcto(){
                                                         // * Código de seguimiento publicado en internet.
         ResponseOca<EstadoEnvio> responseOca = httpOcaEpak.TrackingPieza("3867500000001725327");
-        Assert.AreNotEqual(responseOca.Data.Count, 0, "No se obtuvieron estados");
+        Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran estados del envio");
     }
 
     [TestMethod]
