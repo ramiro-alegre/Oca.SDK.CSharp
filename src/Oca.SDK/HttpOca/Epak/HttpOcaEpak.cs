@@ -50,7 +50,15 @@ namespace OCA.SDK.HttpOca.Epak{
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
             return _httpOcaEpakHelper.DataSetToProvincias(dataset);
         }
-
-
+        /// <summary>
+        /// Obtiene todos los estados que tuvo el envío.
+        /// </summary>
+        /// <param name="numeroEnvio">Numero de envio dado por Oca</param>
+        /// <returns>Lista con todos los estados</returns>
+        public List<EstadoEnvio> TrackingPieza(string numeroEnvio){
+            string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/Tracking_Pieza?NroDocumentoCliente=0&CUIT=0&Pieza={numeroEnvio}");
+            DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
+            return _httpOcaEpakHelper.DataSetToEstado(dataset);
+        }
     }
 }

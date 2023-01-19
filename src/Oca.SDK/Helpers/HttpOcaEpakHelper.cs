@@ -164,5 +164,25 @@ namespace Oca.SDK.Services{
             }
             return provincias;
         }
+
+        public List<EstadoEnvio> DataSetToEstado(DataSet data)
+        {
+            List<EstadoEnvio> estados = new List<EstadoEnvio>();
+            foreach (DataRow row in data.Tables[0].Rows)
+            {
+                DateTime.TryParse(row["fecha"].ToString(), out DateTime fecha);
+
+                estados.Add(
+                    new EstadoEnvio()
+                    {
+                        Estado = row["Desdcripcion_Estado"].ToString(),
+                        MotivoEstado = row["Descripcion_Motivo"].ToString(),
+                        Sucursal = row["SUC"].ToString(),
+                        fecha = fecha
+                    }
+                );
+            }
+            return estados;
+        }
     }
 }

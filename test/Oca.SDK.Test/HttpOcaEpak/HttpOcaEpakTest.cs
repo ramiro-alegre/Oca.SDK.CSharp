@@ -24,4 +24,18 @@ public class HttpOcaEpakTest
         List<Provincia> provincias = httpOcaEpak.GetProvincias();
         Assert.AreNotEqual(provincias.Count, 0, "No se obtuvieron provincias");
     }
+
+    [TestMethod]
+    public void Obtener_Estados_Envio_Correcto(){
+                                                        // * Código de seguimiento publicado en internet.
+        List<EstadoEnvio> estados = httpOcaEpak.TrackingPieza("3867500000001725327");
+        Assert.AreNotEqual(estados.Count, 0, "No se obtuvieron estados");
+    }
+
+    // [TestMethod]
+    // public void Obtener_Estados_Envio_Falla_NroEnvio_No_Existe(){
+    //     List<EstadoEnvio> estados = httpOcaEpak.TrackingPieza("2231300000000004007");
+    //     Assert.AreNotEqual(estados.Count, 0, "No se obtuvieron estados");
+    // }
+
 }
