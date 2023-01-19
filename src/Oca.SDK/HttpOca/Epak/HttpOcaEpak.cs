@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using Oca.SDK.Entitys;
+using Oca.SDK.Exceptions;
+using Oca.SDK.Response;
 using Oca.SDK.Services;
 
 namespace OCA.SDK.HttpOca.Epak{
@@ -35,30 +38,99 @@ namespace OCA.SDK.HttpOca.Epak{
         /// <param name="tipo">Tipo de servicio que de la sucursal que se quiera restacar, por defecto, devuelve todas</param>
         /// <param name="ConCodigosPostalesAcepta">En el caso de que sea true, rellena la lista "CodigosPostalesQueAcepta" de la clase Sucursal, caso contrario, la deja vacia y sin inicializar</param>
         /// <returns>Lista de sucursales</returns>
-        public List<Sucursal> GetCentrosImposicionConServicios(TipoServicio tipo = TipoServicio.SinFiltro, bool ConCodigosPostalesAcepta = false){
+        public ResponseOca<Sucursal> GetCentrosImposicionConServicios(TipoServicio tipo = TipoServicio.SinFiltro, bool ConCodigosPostalesAcepta = false){
             string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetCentrosImposicionConServicios?");
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
-            return _httpOcaEpakHelper.DataSetToSucursales(dataset, tipo, ConCodigosPostalesAcepta);
+            List<Sucursal> sucursales = new List<Sucursal>();
+            try{
+                sucursales = _httpOcaEpakHelper.DataSetToSucursales(dataset, tipo, ConCodigosPostalesAcepta);
+                return new ResponseOca<Sucursal>(){
+                    Success = true,
+                    Data = sucursales,
+                    Message = "OK"
+                };
+            }
+            catch(ListEmptyException e){
+                return new ResponseOca<Sucursal>(){
+                    Success = false,
+                    Data = sucursales,
+                    Message = e.Message
+                };
+            }
+            catch (Exception e)
+            {
+                return new ResponseOca<Sucursal>(){
+                    Success = false,
+                    Data = sucursales,
+                    Message = "Error no controlado: " + e.Message
+                };
+            }
         }
         /// <summary>
         /// Obtiene las provincias
         /// </summary>
         /// <returns>Lista de provincioas</returns>
-        public List<Provincia> GetProvincias()
+        public ResponseOca<Provincia> GetProvincias()
         {
             string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetProvincias");
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
-            return _httpOcaEpakHelper.DataSetToProvincias(dataset);
+            List<Provincia> provincias = new List<Provincia>();
+            try{
+                provincias = _httpOcaEpakHelper.DataSetToProvincias(dataset);
+                return new ResponseOca<Provincia>(){
+                    Success = true,
+                    Data = provincias,
+                    Message = "OK"
+                };
+            }
+            catch(ListEmptyException e){
+                return new ResponseOca<Provincia>(){
+                    Success = false,
+                    Data = provincias,
+                    Message = e.Message
+                };
+            }
+            catch (Exception e)
+            {
+                return new ResponseOca<Provincia>(){
+                    Success = false,
+                    Data = provincias,
+                    Message = "Error no controlado: " + e.Message
+                };
+            }
         }
         /// <summary>
         /// Obtiene todos los estados que tuvo el envío.
         /// </summary>
         /// <param name="numeroEnvio">Numero de envio dado por Oca</param>
         /// <returns>Lista con todos los estados</returns>
-        public List<EstadoEnvio> TrackingPieza(string numeroEnvio){
+        public ResponseOca<EstadoEnvio> TrackingPieza(string numeroEnvio){
             string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/Tracking_Pieza?NroDocumentoCliente=0&CUIT=0&Pieza={numeroEnvio}");
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
-            return _httpOcaEpakHelper.DataSetToEstado(dataset);
+            List<EstadoEnvio> estados = new List<EstadoEnvio>();
+            try{
+                estados = _httpOcaEpakHelper.DataSetToEstado(dataset);
+                return new ResponseOca<EstadoEnvio>(){
+                    Success = true,
+                    Data = estados,
+                    Message = "OK"
+                };
+            }
+            catch(ListEmptyException e){
+                return new ResponseOca<EstadoEnvio>(){
+                    Success = false,
+                    Data = estados,
+                    Message = e.Message
+                };
+            }
+            catch (Exception e)
+            {
+                return new ResponseOca<EstadoEnvio>(){
+                    Success = false,
+                    Data = estados,
+                    Message = "Error no controlado: " + e.Message
+                };
+            }
         }
     }
 }

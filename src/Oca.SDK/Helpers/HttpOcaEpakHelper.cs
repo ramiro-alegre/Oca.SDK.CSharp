@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Net;
 using Oca.SDK.Entitys;
+using Oca.SDK.Exceptions;
 
 namespace Oca.SDK.Services{
     internal class HttpOcaEpakHelper{
@@ -21,6 +22,8 @@ namespace Oca.SDK.Services{
         public List<Sucursal> DataSetToSucursales(DataSet dataset, TipoServicio tipo, bool conCodigosPostalesAcepta = true)
         {
             List<Sucursal> sucursales = new List<Sucursal>();
+            if(dataset.Tables.Count == 0)
+                throw new ListEmptyException("No se pudo obtener la lista de sucursales.");
             for (int i = 0; i < dataset.Tables[0].Rows.Count; i++)
             {
                 Sucursal sucursal = new Sucursal();
@@ -152,6 +155,8 @@ namespace Oca.SDK.Services{
         public List<Provincia> DataSetToProvincias(DataSet data)
         {
             List<Provincia> provincias = new List<Provincia>();
+            if(data.Tables.Count == 0)
+                throw new ListEmptyException("No se pudo obtener la lista de provincias");
             foreach (DataRow row in data.Tables[0].Rows)
             {
                 provincias.Add(
@@ -168,6 +173,8 @@ namespace Oca.SDK.Services{
         public List<EstadoEnvio> DataSetToEstado(DataSet data)
         {
             List<EstadoEnvio> estados = new List<EstadoEnvio>();
+            if(data.Tables.Count == 0)
+                throw new ListEmptyException("No se encontraron estados para el envio");
             foreach (DataRow row in data.Tables[0].Rows)
             {
                 DateTime.TryParse(row["fecha"].ToString(), out DateTime fecha);
