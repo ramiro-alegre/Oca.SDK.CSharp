@@ -21,6 +21,28 @@ public class HttpOcaEpakTest
     }
 
     [TestMethod]
+    public void Obtener_Sucursales_Con_Filtro_Correcto()
+    {
+        ResponseOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios(TipoServicio.EntregaDePaquetes);
+        Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran sucursales");
+    }
+
+    [TestMethod]
+    public void Obtener_Sucursales_Con_Codigos_Postales_Acepta_Correcto()
+    {
+        ResponseOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios(TipoServicio.SinFiltro, true);
+        Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran sucursales");
+        Assert.AreNotEqual(responseOca.Data.Where(d => d.CodigosPostalesQueAcepta.Count == 0).Count(), 0, "Se esperaba que se devolvieran sucursales con codigos postales");
+    }
+
+
+    [TestMethod]
+    public void Obtener_Sucursales_ByCP_Default_Correcto(){
+        ResponseOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServiciosByCP(1617);
+        Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran sucursales");
+    }
+
+    [TestMethod]
     public void Obtener_Provincias_Correcto(){
         ResponseOca<Provincia> responseOca = httpOcaEpak.GetProvincias();
         Assert.AreNotEqual(responseOca.Data.Count, 0, "Se espera que se devolvieran provincias");
@@ -37,7 +59,13 @@ public class HttpOcaEpakTest
     public void Obtener_Estados_Envio_Falla_NroEnvio_No_Existe(){
         ResponseOca<EstadoEnvio> responseOca = httpOcaEpak.TrackingPieza("2231300000000004007");
         Assert.AreEqual(responseOca.Data.Count, 0, "Se esperaba que no se devolvieran estados");
-        Assert.AreEqual(responseOca.Success, false, "Se esperaba que la respuesta sea false");
+        Assert.AreEqual(responseOca.Success, false, "Se esperaba que Sucess sea false");
+    }
+
+    [TestMethod]
+    public void Obtener_Codigos_Postales_Por_Centro_Imposicion_Correcto(){
+        ResponseOca<string> responseOca = httpOcaEpak.GetCodigosPostalesXCentroImposicion(146);
+        Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran codigos postales");
     }
 
 }

@@ -54,6 +54,62 @@ namespace Oca.SDK.Services{
         }
 
         /// <summary>
+        /// Se encarga de crear un objeto Provincia a partir de un Dat
+        /// </summary>
+        /// <param name="row">DataRow de la información de la provincia de oca</param>
+        /// <returns>Provincia creada a partir del datarow enviado</returns>
+        public List<Provincia> DataSetToProvincias(DataSet data)
+        {
+            List<Provincia> provincias = new List<Provincia>();
+            if(data.Tables.Count == 0)
+                throw new ListEmptyException("No se pudo obtener la lista de provincias");
+            foreach (DataRow row in data.Tables[0].Rows)
+            {
+                provincias.Add(
+                    new Provincia()
+                    {
+                        Id = Convert.ToInt32(row["IdProvincia"].ToString()),
+                        Nombre = row["Descripcion"].ToString().Trim()
+                    }
+                );
+            }
+            return provincias;
+        }
+        public List<EstadoEnvio> DataSetToEstado(DataSet data)
+        {
+            List<EstadoEnvio> estados = new List<EstadoEnvio>();
+            if(data.Tables.Count == 0)
+                throw new ListEmptyException("No se encontraron estados para el envio");
+            foreach (DataRow row in data.Tables[0].Rows)
+            {
+                DateTime.TryParse(row["fecha"].ToString(), out DateTime fecha);
+
+                estados.Add(
+                    new EstadoEnvio()
+                    {
+                        Estado = row["Desdcripcion_Estado"].ToString(),
+                        MotivoEstado = row["Descripcion_Motivo"].ToString(),
+                        Sucursal = row["SUC"].ToString(),
+                        fecha = fecha
+                    }
+                );
+            }
+            return estados;
+        }
+
+        public List<string> DataSetToCodigosPostales(DataSet data)
+        {
+            List<string> codigosPostales = new List<string>();
+            if(data.Tables.Count == 0)
+                throw new ListEmptyException("No se encontraron codigos postales para la sucursal");
+            foreach (DataRow row in data.Tables[0].Rows)
+            {
+                codigosPostales.Add(row["CodigoPostal"].ToString());
+            }
+            return codigosPostales;
+        }
+
+        /// <summary>
         /// Se encarga de procesar un DataRow que tiene la información de una sucursal de Oca.
         /// </summary>
         /// <param name="row">DataRow de la información de la sucursal de oca</param>
@@ -145,51 +201,6 @@ namespace Oca.SDK.Services{
                 return Convert.ToInt32(Math.Round(numeroD));
             // * Un ejemplo de un return null es cuando numero es "S/N".
             return null;
-        }
-
-        /// <summary>
-        /// Se encarga de crear un objeto Provincia a partir de un Dat
-        /// </summary>
-        /// <param name="row">DataRow de la información de la provincia de oca</param>
-        /// <returns>Provincia creada a partir del datarow enviado</returns>
-        public List<Provincia> DataSetToProvincias(DataSet data)
-        {
-            List<Provincia> provincias = new List<Provincia>();
-            if(data.Tables.Count == 0)
-                throw new ListEmptyException("No se pudo obtener la lista de provincias");
-            foreach (DataRow row in data.Tables[0].Rows)
-            {
-                provincias.Add(
-                    new Provincia()
-                    {
-                        Id = Convert.ToInt32(row["IdProvincia"].ToString()),
-                        Nombre = row["Descripcion"].ToString().Trim()
-                    }
-                );
-            }
-            return provincias;
-        }
-
-        public List<EstadoEnvio> DataSetToEstado(DataSet data)
-        {
-            List<EstadoEnvio> estados = new List<EstadoEnvio>();
-            if(data.Tables.Count == 0)
-                throw new ListEmptyException("No se encontraron estados para el envio");
-            foreach (DataRow row in data.Tables[0].Rows)
-            {
-                DateTime.TryParse(row["fecha"].ToString(), out DateTime fecha);
-
-                estados.Add(
-                    new EstadoEnvio()
-                    {
-                        Estado = row["Desdcripcion_Estado"].ToString(),
-                        MotivoEstado = row["Descripcion_Motivo"].ToString(),
-                        Sucursal = row["SUC"].ToString(),
-                        fecha = fecha
-                    }
-                );
-            }
-            return estados;
         }
     }
 }
