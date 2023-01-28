@@ -5,7 +5,7 @@
 
 [![Nuget](https://img.shields.io/nuget/v/Oca.SDK)](https://www.nuget.org/packages/Oca.SDK)
 
-## Descrición
+## Descripción
 
 Para comenzar a utilizar el paquete, hay una clase llamada HttpOcaEpak que se encarga de hacer las peticiones al WebService de OCA epak.
 En el caso de que se quiera utilizar este paquete apuntando al webservice de producción, se debe de ingresar el usuario, contraseña y numero de cuenta de OCA ePak, caso contrario, simplemente se debe de dejar en false el ultimo parametro. <br/>

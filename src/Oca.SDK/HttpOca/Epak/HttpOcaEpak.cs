@@ -245,6 +245,14 @@ namespace OCA.SDK.HttpOca.Epak{
                 };
             }
         }
+        /// <summary>
+        /// Genera la orden de retiro. Recibe el XML en el caso de que se quiera generar de forma externa. <br/>
+        /// En el caso de que confirmarRetiro sea false, no va a devolver nada en la data, solo una lista vacia. Para más información, ver el parametro.
+        /// </summary>
+        /// <param name="xmlDatos">Xml generado</param>
+        /// <param name="confirmarRetiro">En el caso de que sea true, la orden de retiro va a ser confirmada y se va devolver información de la misma. 
+        /// Caso contrario, la lista va a volver vacia y el envio va a quedar a la espera de su confirmación.</param>
+        /// <returns></returns>
         public ResponseOca<OrdenRetiroResponse> IngresoORMultiplesRetiros(string xmlDatos, bool confirmarRetiro){
             string xmlResponse = "";
             using(WebClient wc = new WebClient()){
@@ -259,7 +267,7 @@ namespace OCA.SDK.HttpOca.Epak{
                 return new ResponseOca<OrdenRetiroResponse>(){
                     Success = true,
                     Data = ordenes,
-                    Message = "OK"
+                    Message = (ordenes.Count > 0 ? "OK" : "Orden de retiro generada en espera de su confirmación")
                 };
             }
             catch(ListEmptyException e){
@@ -278,6 +286,14 @@ namespace OCA.SDK.HttpOca.Epak{
                 };
             }
         }
+        /// <summary>
+        /// Genera la orden de retiro. <br/>
+        /// En el caso de que confirmarRetiro sea false, no va a devolver nada en la data, solo una lista vacia. Para más información, ver el parametro.
+        /// </summary>
+        /// <param name="datos">Datos para generar la orden de retiro</param>
+        /// <param name="confirmarRetiro">En el caso de que sea true, la orden de retiro va a ser confirmada y se va devolver información de la misma. 
+        /// Caso contrario, la lista va a volver vacia y el envio va a quedar a la espera de su confirmación.</param>
+        /// <returns></returns>
         public ResponseOca<OrdenRetiroResponse> IngresoORMultiplesRetiros(OrdenRetiroDatos datos, bool confirmarRetiro){
             string xmlDatos = _httpOcaEpakHelper.OrdenRetiroDatosToXml(datos, this._nroCuenta);
             return this.IngresoORMultiplesRetiros(xmlDatos, confirmarRetiro);
