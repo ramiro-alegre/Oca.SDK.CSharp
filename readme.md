@@ -3,7 +3,7 @@
     Este paquete no es oficial de OCA y no tiene ánimo de lucro. Es un proyecto personal creado para hacer más fácil la integración con OCA y una alternativa al WSDL.
 </div> <br/>
 
-![Nuget](https://img.shields.io/nuget/v/Oca.SDK)
+[![Nuget](https://img.shields.io/nuget/v/Oca.SDK)](https://www.nuget.org/packages/Oca.SDK)
 
 ## Descrición
 
