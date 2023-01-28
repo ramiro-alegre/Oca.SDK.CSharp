@@ -9,7 +9,7 @@ namespace Oca.SDK.Response
     /// Contiene un mensaje con información. Este es bueno revisarlo cuando "Sucess" es false.<br/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ResponseOca<T> : IResponseOca<T>
+    public class ResponseOca<T> : IResponseOca<T> where T : class
     {
         /// <summary>
         /// True si la respuesta fue exitosa, caso contrario, false. <br/>

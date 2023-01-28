@@ -52,12 +52,11 @@ namespace Oca.SDK.Services{
             }
             return sucursales;
         }
-
         /// <summary>
-        /// Se encarga de crear un objeto Provincia a partir de un Dat
+        /// Se encarga de crear una lista de <see cref="Provincia"/> a partir de un DataSet
         /// </summary>
-        /// <param name="row">DataRow de la información de la provincia de oca</param>
-        /// <returns>Provincia creada a partir del datarow enviado</returns>
+        /// <param name="data">DataSet de la información de la provincia de oca</param>
+        /// <returns>Lista de provincias creada a partir del DataSet enviado</returns>
         public List<Provincia> DataSetToProvincias(DataSet data)
         {
             List<Provincia> provincias = new List<Provincia>();
@@ -75,6 +74,11 @@ namespace Oca.SDK.Services{
             }
             return provincias;
         }
+        /// <summary>
+        /// Se encarga de crear una lista de <see cref="EstadoEnvio"/> a partir de un DataSet
+        /// </summary>
+        /// <param name="data">DataSet de la información de los estados del envio</param>
+        /// <returns>Lista de estados a partir del DataSet enviado</returns>
         public List<EstadoEnvio> DataSetToEstado(DataSet data)
         {
             List<EstadoEnvio> estados = new List<EstadoEnvio>();
@@ -96,7 +100,11 @@ namespace Oca.SDK.Services{
             }
             return estados;
         }
-
+        /// <summary>
+        /// Se encarga de crear una lista de string de los codigos postales a partir de un DataSet
+        /// </summary>
+        /// <param name="data">DataSet de los codigos postales</param>
+        /// <returns>Lista de codigos postales</returns>
         public List<string> DataSetToCodigosPostales(DataSet data)
         {
             List<string> codigosPostales = new List<string>();
@@ -108,7 +116,50 @@ namespace Oca.SDK.Services{
             }
             return codigosPostales;
         }
+        /// <summary>
+        /// Se encargar de crear una lista de <see cref="OrdenRetiroResponse"/> a partir de un DataSet. <br/>
+        /// A pesar de generar una lista, solo se devolverá un elemento ya que la respuesta de la API es un solo elemento.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public List<OrdenRetiroResponse> DataSetToOrdenRetiroResponse(DataSet data){
+            if(data.Tables[0].TableName == "Error" || data.Tables[0].TableName == "Errores")
+                throw new ListEmptyException(data.Tables[0].Rows[0]["Descripcion"].ToString());
+            
+            return new List<OrdenRetiroResponse>(){
+                new OrdenRetiroResponse{
+                    IdOrdenRetiro = data.Tables[1].Rows[0]["OrdenRetiro"].ToString(),
+                    NumeroEnvio = data.Tables[1].Rows[0]["NumeroEnvio"].ToString()
+                }
+            };
+        }
+        /// <summary>
+        /// Transforma el <see cref="OrdenRetiroDatos"/> en un xml para ser enviado al webservice de OCA.
+        /// </summary>
+        /// <param name="datos"></param>
+        /// <param name="nroCuenta"></param>
+        /// <returns>Xml</returns>
+        public string OrdenRetiroDatosToXml(OrdenRetiroDatos datos, string nroCuenta){
+            string xmlTemporal = @$"<?xml version=""1.0"" encoding=""iso-8859-1"" standalone=""yes""?> 
+            <ROWS> 
+                <cabecera ver=""2.0"" nrocuenta=""{nroCuenta}""/> 
+                <origenes> 
+                    <origen calle=""{datos.OrigenOca.Calle}"" nro=""{datos.OrigenOca.Numero}"" piso=""{datos.OrigenOca.Piso}"" depto=""{datos.OrigenOca.Depto}"" cp=""{datos.OrigenOca.CodigoPostal}"" localidad=""{datos.OrigenOca.Localidad}"" provincia=""{datos.OrigenOca.Provincia}"" contacto=""{datos.OrigenOca.Contacto}"" email=""{datos.OrigenOca.Email}"" solicitante=""{datos.OrigenOca.Solicitante}"" observaciones=""{datos.OrigenOca.Observaciones}"" centrocosto=""{datos.OrigenOca.CentroCosto}"" idfranjahoraria=""{(int)datos.OrigenOca.FranjaHoraria}"" idcentroimposicionorigen=""{datos.OrigenOca.IdCentroImposicionOrigen}"" fecha=""{datos.OrigenOca.Fecha}""> 
+                        <envios>";
 
+            foreach(var envio in datos.EnviosPaquetes){
+                xmlTemporal += @$"<envio idoperativa=""{envio.Envio.IdOperativa}"" nroremito=""{envio.Envio.NroRemito}""> 
+                            <destinatario apellido=""{envio.Destinatario.Apellido}"" nombre=""{envio.Destinatario.Nombre}"" calle=""{envio.Destinatario.Calle}"" nro=""{envio.Destinatario.Numero}"" piso=""{envio.Destinatario.Piso}"" depto=""{envio.Destinatario.Depto}"" localidad=""{envio.Destinatario.Localidad}"" provincia=""{envio.Destinatario.Provincia}"" cp=""{envio.Destinatario.CodigoPostal}"" telefono=""{envio.Destinatario.Telefono}"" email=""{envio.Destinatario.Email}"" idci=""{envio.Destinatario.IdCentroImposicionDestino}"" celular=""{envio.Destinatario.Celular}"" observaciones=""{envio.Destinatario.Observaciones}""/> 
+                            <paquetes>"; 
+               foreach(var paquete in envio.Paquetes){
+                    xmlTemporal +=  @$"<paquete alto=""{paquete.Alto}"" ancho=""{paquete.Ancho}"" largo=""{paquete.Largo}"" peso=""{paquete.Peso}"" valor=""{paquete.Valor}"" cant=""{paquete.Cantidad}"" />";
+               }
+                xmlTemporal +=  "</paquetes></envio>";
+            }
+            
+            xmlTemporal += "</envios> </origen> </origenes> </ROWS>";
+            return xmlTemporal;
+        }
         /// <summary>
         /// Se encarga de procesar un DataRow que tiene la información de una sucursal de Oca.
         /// </summary>
@@ -191,7 +242,7 @@ namespace Oca.SDK.Services{
         /// double. Incluso, hay casos donde la sucursal no tiene numero, y simplemente la respuesta es "S/N"
         /// </summary>
         /// <param name="Numero">Numero de la sucursal</param>
-        /// <returns>En el casod de que haya podido parsear a un int, se devuelve el numero, caso contrario, devuelve null</returns>
+        /// <returns>En el caso de que haya podido parsear a un int, se devuelve el numero, caso contrario, devuelve null</returns>
         private int? ObtenerNumeroDeCalle(string Numero)
         {
             if (int.TryParse(Numero, out int numero))

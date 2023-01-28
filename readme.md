@@ -13,7 +13,7 @@ Ejemplo:
 ```csharp
 var ocaEpak = new HttpOcaEpak();
 
-// * Obteniendo las provivincias
+// * Obteniendo las provincias
 ResponseOca<Provincia> provincias = ocaEpak.GetProvincias();
 Console.WriteLine(provincias.Data.Count);
 

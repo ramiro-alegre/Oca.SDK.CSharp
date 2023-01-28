@@ -32,6 +32,7 @@ jobs:
   package:
     runs-on: ubuntu-20.04
     needs: [build, test]
+    if: ${{ github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -49,6 +50,7 @@ jobs:
   deploy:
     runs-on: ubuntu-20.04
     needs: [build, test, package]
+    if: ${{ github.event_name == 'push' }}
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2
@@ -56,7 +58,6 @@ jobs:
           name: artifacts
           path: artifacts
       - name: Deploy
-        if: ${{ github.event_name == 'push' }}
         run: |
           cd artifacts
           dotnet nuget push *.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

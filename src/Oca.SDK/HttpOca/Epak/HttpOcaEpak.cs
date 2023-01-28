@@ -1,7 +1,9 @@
+using System.Collections.Specialized;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Net;
+using System.Net.Http;
 using Oca.SDK.Entitys;
 using Oca.SDK.Exceptions;
 using Oca.SDK.Response;
@@ -16,21 +18,32 @@ namespace OCA.SDK.HttpOca.Epak{
         /// <summary>
         /// URL Interna que se utiliza para la conexión al webservice de OCA.
         /// </summary>
-        public readonly string _url;
-        private readonly WebClient wc;
+        public readonly string url;
         private readonly HttpOcaEpakHelper _httpOcaEpakHelper;
+        private readonly string _usr;
+        private readonly string _psw;
+        private readonly string _nroCuenta;
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="esProduccion">Define qué webservice se va a utilizar <br/>
-        ///                            true: webservice de producción <br/>
-        ///                            false: webservice de pruebas
-        /// </param>
-        public HttpOcaEpak(bool esProduccion = true){
-            _url = esProduccion ? "http://webservice.oca.com.ar/epak_tracking/" : "http://webservice.oca.com.ar/epak_Tracking_TEST/";
-            this.esProduccion = esProduccion;
-            this.wc = new WebClient();
-            this._httpOcaEpakHelper = new HttpOcaEpakHelper(_url);
+        /// <param name="usr">Usuario de Oca ePak</param>
+        /// <param name="pws">Contraseña de Oca ePak</param>
+        /// <param name="nroCuenta">Numero de cuenta de Oca ePak</param>
+        /// <param name="esProduccion">True si es producción, caso contrario, se usa la URL de testing. <br/>
+        /// En el caso de que se envie false, automaticamente se rellenan los demás valores con las credenciales de TEST</param>
+        public HttpOcaEpak(string usr, string pws, string nroCuenta, bool esProduccion = true){
+            if(esProduccion){
+                this._usr = usr;
+                this._psw = pws;
+                this._nroCuenta = nroCuenta;
+                this.url = "http://webservice.oca.com.ar/epak_tracking/";
+            }else{
+                this._usr = "test@oca.com.ar";
+                this._psw = "123456";
+                this._nroCuenta = "111757/001";
+                this.url = "http://webservice.oca.com.ar/epak_Tracking_TEST/";
+            }
+            this._httpOcaEpakHelper = new HttpOcaEpakHelper(url);
         }
         /// <summary>
         /// Obtiene las sucursales con servicios activas al momento desde el servicio de Oca
@@ -40,7 +53,10 @@ namespace OCA.SDK.HttpOca.Epak{
         /// La información que se obtiene es la misma que retorna <see href="GetCodigosPostalesXCentroImposicion"/></param>
         /// <returns>Lista de sucursales</returns>
         public ResponseOca<Sucursal> GetCentrosImposicionConServicios(TipoServicio tipo = TipoServicio.SinFiltro, bool ConCodigosPostalesAcepta = false){
-            string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetCentrosImposicionConServicios?");
+            string xmlResponse = "";
+            using(WebClient wc = new WebClient()){
+                xmlResponse = wc.DownloadString($"{url}Oep_TrackEPak.asmx/GetCentrosImposicionConServicios?");
+            }
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
             List<Sucursal> sucursales = new List<Sucursal>();
             try{
@@ -83,7 +99,10 @@ namespace OCA.SDK.HttpOca.Epak{
                     Message = "El código postal debe ser un número de 4 dígitos"
                 };
 
-            string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetCentrosImposicionConServiciosByCP?CodigoPostal={codigoPostal}");
+            string xmlResponse = "";
+            using(WebClient wc = new WebClient()){
+                xmlResponse = wc.DownloadString($"{url}Oep_TrackEPak.asmx/GetCentrosImposicionConServiciosByCP?CodigoPostal={codigoPostal}");
+            }
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
             List<Sucursal> sucursales = new List<Sucursal>();
             try{
@@ -124,7 +143,10 @@ namespace OCA.SDK.HttpOca.Epak{
                     Message = "El id del centro de imposición debe ser un número mayor a 0"
                 };
 
-            string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetCodigosPostalesXCentroImposicion?IdCentroImposicion={idCentroImposicion}");
+            string xmlResponse = "";
+            using(WebClient wc = new WebClient()){
+                xmlResponse = wc.DownloadString($"{url}Oep_TrackEPak.asmx/GetCodigosPostalesXCentroImposicion?IdCentroImposicion={idCentroImposicion}");
+            }
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
             List<string> codigosPostales = new List<string>();
             try{
@@ -157,7 +179,10 @@ namespace OCA.SDK.HttpOca.Epak{
         /// <returns>Lista de provincioas</returns>
         public ResponseOca<Provincia> GetProvincias()
         {
-            string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/GetProvincias");
+            string xmlResponse = "";
+            using(WebClient wc = new WebClient()){
+                xmlResponse = wc.DownloadString($"{url}Oep_TrackEPak.asmx/GetProvincias");
+            }
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
             List<Provincia> provincias = new List<Provincia>();
             try{
@@ -190,7 +215,10 @@ namespace OCA.SDK.HttpOca.Epak{
         /// <param name="numeroEnvio">Numero de envio dado por Oca</param>
         /// <returns>Lista con todos los estados</returns>
         public ResponseOca<EstadoEnvio> TrackingPieza(string numeroEnvio){
-            string xmlResponse = wc.DownloadString($"{_url}Oep_TrackEPak.asmx/Tracking_Pieza?NroDocumentoCliente=0&CUIT=0&Pieza={numeroEnvio}");
+            string xmlResponse = "";
+            using(WebClient wc = new WebClient()){
+                xmlResponse = wc.DownloadString($"{url}Oep_TrackEPak.asmx/Tracking_Pieza?NroDocumentoCliente=0&CUIT=0&Pieza={numeroEnvio}");
+            }
             DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
             List<EstadoEnvio> estados = new List<EstadoEnvio>();
             try{
@@ -217,5 +245,43 @@ namespace OCA.SDK.HttpOca.Epak{
                 };
             }
         }
+        public ResponseOca<OrdenRetiroResponse> IngresoORMultiplesRetiros(string xmlDatos, bool confirmarRetiro){
+            string xmlResponse = "";
+            using(WebClient wc = new WebClient()){
+                string parametros = $"usr={this._usr}&psw={this._psw}&xml_Datos={xmlDatos}&ConfirmarRetiro={confirmarRetiro.ToString()}&ArchivoCliente={""}&ArchivoProceso={""}";
+                wc.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
+                xmlResponse = wc.UploadString($"{url}Oep_TrackEPak.asmx/IngresoORMultiplesRetiros", parametros);
+            }
+            DataSet dataset = Utils.XmlUtils.ToDataSet(xmlResponse);
+            List<OrdenRetiroResponse> ordenes = new List<OrdenRetiroResponse>();
+            try{
+                ordenes = _httpOcaEpakHelper.DataSetToOrdenRetiroResponse(dataset);
+                return new ResponseOca<OrdenRetiroResponse>(){
+                    Success = true,
+                    Data = ordenes,
+                    Message = "OK"
+                };
+            }
+            catch(ListEmptyException e){
+                return new ResponseOca<OrdenRetiroResponse>(){
+                    Success = false,
+                    Data = ordenes,
+                    Message = e.Message
+                };
+            }
+            catch (Exception e)
+            {
+                return new ResponseOca<OrdenRetiroResponse>(){
+                    Success = false,
+                    Data = ordenes,
+                    Message = "Error no controlado: " + e.Message
+                };
+            }
+        }
+        public ResponseOca<OrdenRetiroResponse> IngresoORMultiplesRetiros(OrdenRetiroDatos datos, bool confirmarRetiro){
+            string xmlDatos = _httpOcaEpakHelper.OrdenRetiroDatosToXml(datos, this._nroCuenta);
+            return this.IngresoORMultiplesRetiros(xmlDatos, confirmarRetiro);
+        }
+        
     }
 }
