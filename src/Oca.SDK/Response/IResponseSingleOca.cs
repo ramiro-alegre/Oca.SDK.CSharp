@@ -2,10 +2,10 @@ using System.Collections.Generic;
 
 namespace Oca.SDK.Response
 {
-    public interface IResponseListOca<T>
+    public interface IResponseSingleOca<T>
     {
         bool Success { get; set; }
-        List<T> Data { get; set; }
+        T Data { get; set; }
         string Message { get; set; }
     }
 }

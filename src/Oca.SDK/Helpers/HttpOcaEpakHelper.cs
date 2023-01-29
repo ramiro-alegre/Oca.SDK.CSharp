@@ -122,18 +122,16 @@ namespace Oca.SDK.Services{
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public List<OrdenRetiroResponse> DataSetToOrdenRetiroResponse(DataSet data){
+        public OrdenRetiroResponse? DataSetToOrdenRetiroResponse(DataSet data){
             if(data.Tables[0].TableName == "Error" || data.Tables[0].TableName == "Errores")
                 throw new ListEmptyException(data.Tables[0].Rows[0]["Descripcion"].ToString());
             if(data.Tables[1].Rows.Count == 0)
-                return new List<OrdenRetiroResponse>();
+                return null;
 
-            return new List<OrdenRetiroResponse>(){
-                new OrdenRetiroResponse{
-                    IdOrdenRetiro = data.Tables[1].Rows[0]["OrdenRetiro"].ToString(),
-                    NumeroEnvio = data.Tables[1].Rows[0]["NumeroEnvio"].ToString()
-                }
-            };
+            return new OrdenRetiroResponse{
+                        IdOrdenRetiro = data.Tables[1].Rows[0]["OrdenRetiro"].ToString(),
+                        NumeroEnvio = data.Tables[1].Rows[0]["NumeroEnvio"].ToString()
+                    };
         }
         /// <summary>
         /// Transforma el <see cref="OrdenRetiroDatos"/> en un xml para ser enviado al webservice de OCA.

@@ -16,21 +16,21 @@ public class HttpOcaEpakTest
     [TestMethod]
     public void Obtener_Sucursales_Default_Correcto()
     {
-        ResponseOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios();
+        ResponseListOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios();
         Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran sucursales");
     }
 
     [TestMethod]
     public void Obtener_Sucursales_Con_Filtro_Correcto()
     {
-        ResponseOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios(TipoServicio.EntregaDePaquetes);
+        ResponseListOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios(TipoServicio.EntregaDePaquetes);
         Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran sucursales");
     }
 
     [TestMethod]
     public void Obtener_Sucursales_Con_Codigos_Postales_Acepta_Correcto()
     {
-        ResponseOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios(TipoServicio.SinFiltro, true);
+        ResponseListOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServicios(TipoServicio.SinFiltro, true);
         Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran sucursales");
         Assert.AreNotEqual(responseOca.Data.Where(d => d.CodigosPostalesQueAcepta.Count == 0).Count(), 0, "Se esperaba que se devolvieran sucursales con codigos postales");
     }
@@ -38,33 +38,33 @@ public class HttpOcaEpakTest
 
     [TestMethod]
     public void Obtener_Sucursales_ByCP_Default_Correcto(){
-        ResponseOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServiciosByCP(1617);
+        ResponseListOca<Sucursal> responseOca = httpOcaEpak.GetCentrosImposicionConServiciosByCP(1617);
         Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran sucursales");
     }
 
     [TestMethod]
     public void Obtener_Provincias_Correcto(){
-        ResponseOca<Provincia> responseOca = httpOcaEpak.GetProvincias();
+        ResponseListOca<Provincia> responseOca = httpOcaEpak.GetProvincias();
         Assert.AreNotEqual(responseOca.Data.Count, 0, "Se espera que se devolvieran provincias");
     }
 
     [TestMethod]
     public void Obtener_Estados_Envio_Correcto(){
                                                         // * Código de seguimiento publicado en internet.
-        ResponseOca<EstadoEnvio> responseOca = httpOcaEpak.TrackingPieza("3867500000001725327");
+        ResponseListOca<EstadoEnvio> responseOca = httpOcaEpak.TrackingPieza("3867500000001725327");
         Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran estados del envio");
     }
 
     [TestMethod]
     public void Obtener_Estados_Envio_Falla_NroEnvio_No_Existe(){
-        ResponseOca<EstadoEnvio> responseOca = httpOcaEpak.TrackingPieza("2231300000000004007");
+        ResponseListOca<EstadoEnvio> responseOca = httpOcaEpak.TrackingPieza("2231300000000004007");
         Assert.AreEqual(responseOca.Data.Count, 0, "Se esperaba que no se devolvieran estados");
         Assert.AreEqual(responseOca.Success, false, "Se esperaba que Sucess sea false");
     }
 
     [TestMethod]
     public void Obtener_Codigos_Postales_Por_Centro_Imposicion_Correcto(){
-        ResponseOca<string> responseOca = httpOcaEpak.GetCodigosPostalesXCentroImposicion(146);
+        ResponseListOca<string> responseOca = httpOcaEpak.GetCodigosPostalesXCentroImposicion(146);
         Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolvieran codigos postales");
     }
 
@@ -89,8 +89,30 @@ public class HttpOcaEpakTest
                 </origen> 
             </origenes> 
         </ROWS>";
-        ResponseOca<OrdenRetiroResponse> responseOca =  httpOcaEpak.IngresoORMultiplesRetiros(xmlTemporal, true);
-        Assert.AreNotEqual(responseOca.Data.Count, 0, "Se esperaba que se devolviera información de la orden de retiro");
+        ResponseSingleOca<OrdenRetiroResponse> responseOca =  httpOcaEpak.IngresoORMultiplesRetiros(xmlTemporal, true);
+        Assert.AreNotEqual(responseOca.Data, null, "Se esperaba que se devolviera información de la orden de retiro");
+    }
+
+    [TestMethod]
+    public void Generar_OR_Correcto_Generando_Xml_Confirmar_Retiro_False(){
+        string xmlTemporal = @"<?xml version=""1.0"" encoding=""iso-8859-1"" standalone=""yes""?> 
+        <ROWS> 
+            <cabecera ver=""2.0"" nrocuenta=""111757/001""/> 
+            <origenes> 
+                <origen calle=""La Rioja"" nro=""300"" piso="""" depto="""" cp=""1215"" localidad=""CAPITAL FEDERAL"" provincia=""CAPITAL FEDERAL"" contacto="""" email=""test@oca.com.ar"" solicitante="""" observaciones="""" centrocosto="""" idfranjahoraria=""1"" idcentroimposicionorigen=""0"" fecha=""20151015""> 
+                    <envios> 
+                        <envio idoperativa=""64665"" nroremito=""Envio1""> 
+                            <destinatario apellido=""Fernandez"" nombre=""Martin"" calle=""BALCARCE"" nro=""50"" piso="""" depto="""" localidad=""CAPITAL FEDERAL"" provincia=""CAPITAL FEDERAL"" cp=""1214"" telefono=""49569622"" email=""test@oca.com.ar"" idci=""0"" celular=""1121877788"" observaciones=""Prueba""/> 
+                            <paquetes> 
+                                <paquete alto=""10"" ancho=""10"" largo=""10"" peso=""1"" valor=""10"" cant=""3"" /> 
+                            </paquetes> 
+                        </envio> 
+                    </envios> 
+                </origen> 
+            </origenes> 
+        </ROWS>";
+        ResponseSingleOca<OrdenRetiroResponse> responseOca =  httpOcaEpak.IngresoORMultiplesRetiros(xmlTemporal, false);
+        Assert.AreNotEqual(responseOca.Success, false, "Se esperaba que sucess sea true");
     }
     [TestMethod]
     public void Generar_OR_Falla_Generando_Xml_Invalido(){
@@ -112,8 +134,8 @@ public class HttpOcaEpakTest
                 </origen> 
             </origenes> 
         </ROWS>";
-        ResponseOca<OrdenRetiroResponse> responseOca =  httpOcaEpak.IngresoORMultiplesRetiros(xmlTemporal, true);
-        Assert.AreEqual(responseOca.Data.Count, 0, "Se esperaba que no se devolviera información de la orden de retiro");
+        ResponseSingleOca<OrdenRetiroResponse> responseOca =  httpOcaEpak.IngresoORMultiplesRetiros(xmlTemporal, true);
+        Assert.AreEqual(responseOca.Data, null, "Se esperaba que no se devolviera información de la orden de retiro");
     }
     [TestMethod]
     public void Generar_OR_Correcto_Con_Clases(){
@@ -172,7 +194,7 @@ public class HttpOcaEpakTest
             Paquetes = paquetes
         });
         OrdenRetiroDatos datos = new OrdenRetiroDatos(origen, envioPaquetes);
-        ResponseOca<OrdenRetiroResponse> responseOca = httpOcaEpak.IngresoORMultiplesRetiros(datos, true);
-        Assert.AreNotEqual(responseOca.Data, 0, "Se esperaba que se devolviera información de la orden de retiro");
+        ResponseSingleOca<OrdenRetiroResponse> responseOca = httpOcaEpak.IngresoORMultiplesRetiros(datos, true);
+        Assert.AreNotEqual(responseOca.Data, null, "Se esperaba que se devolviera información de la orden de retiro");
     }
 }
